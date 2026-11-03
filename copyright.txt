@@ -1,0 +1,20 @@
+****************Sneller English*****************
+
+The free demo version of Sneller.
+ 
+The Demo includes sound files and music files. These files are property of and 
+copyrighted by Richard van Tol, Hugo Verweij and Sander Huiberts of 
+Soundsupport.net and may not be used for anything else without permission of 
+soundsupport.net
+The use of the game is free and you may use, copy and distribute the demo solely 
+for demonstration purposes and evaluation, provided that no modification is made 
+to the program, that all of the original files are included unmodified, that no 
+files are added, and that it is not sold for profit. Commercial use of the demo 
+is prohibited. You may not disassemble, decompose, reverse engineer, or alter 
+any of the files in the package.
+
+The demo is Copyright (c) 2001-2002 Soundsupport.net
+
+Disclaimer: The demo software comes without any warranty. You use it at your own 
+risk. In no event shall Soundsupport.net be liable for any damages arising out 
+of the use of the demo. However, the demo is stable and safe!

@@ -1,0 +1,17 @@
+# OS files
+.DS_Store
+*/.DS_Store
+
+# Build artifacts
+Drive.app/
+*.zip
+*.tar.gz
+build/
+.build/
+DerivedData/
+
+# Runtime generated / temporary logs
+Xtras/_xtralog!.txt
+Xtras/hiscore.json
+*.swp
+*~
