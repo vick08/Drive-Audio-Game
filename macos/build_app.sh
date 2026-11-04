@@ -46,21 +46,44 @@ cat > "${CONTENTS_DIR}/Info.plist" <<'EOF'
 </plist>
 EOF
 
+rm -rf "${BUNDLE_RES_DIR}/Xtras" "${BUNDLE_RES_DIR}/pics"
+echo "Copying runtime assets into app bundle..."
+cp -R "${ROOT_DIR}/Xtras" "${BUNDLE_RES_DIR}/Xtras"
+cp -R "${ROOT_DIR}/pics" "${BUNDLE_RES_DIR}/pics"
 cp -f "${RES_DIR}/cps_patches.json" "${BUNDLE_RES_DIR}/cps_patches.json"
-ln -sfn "../../Xtras" "${BUNDLE_RES_DIR}/Xtras"
-ln -sfn "../../pics" "${BUNDLE_RES_DIR}/pics"
 
-echo "Compiling Drive.app..."
-swiftc -O \
+BUILD_DIR="$(mktemp -d)"
+trap 'rm -rf "${BUILD_DIR}"' EXIT
+
+SWIFT_SOURCES=(
+    "${SRC_DIR}/CPSAudioEngine.swift"
+    "${SRC_DIR}/DirectorRuntime.swift"
+    "${SRC_DIR}/AppShell.swift"
+    "${SRC_DIR}/VerifySuite.swift"
+    "${SRC_DIR}/main.swift"
+)
+
+echo "Compiling Drive for Apple Silicon (arm64)..."
+swiftc -O -target arm64-apple-macos12.0 \
     -framework AppKit \
     -framework AVFoundation \
     -framework Foundation \
-    "${SRC_DIR}/CPSAudioEngine.swift" \
-    "${SRC_DIR}/DirectorRuntime.swift" \
-    "${SRC_DIR}/AppShell.swift" \
-    "${SRC_DIR}/VerifySuite.swift" \
-    "${SRC_DIR}/main.swift" \
-    -o "${MACOS_BIN_DIR}/Drive"
+    "${SWIFT_SOURCES[@]}" \
+    -o "${BUILD_DIR}/Drive_arm64"
 
+echo "Compiling Drive for Intel (x86_64)..."
+swiftc -O -target x86_64-apple-macos12.0 \
+    -framework AppKit \
+    -framework AVFoundation \
+    -framework Foundation \
+    "${SWIFT_SOURCES[@]}" \
+    -o "${BUILD_DIR}/Drive_x86_64"
+
+echo "Creating Universal binary (arm64 + x86_64)..."
+lipo -create -output "${MACOS_BIN_DIR}/Drive" "${BUILD_DIR}/Drive_arm64" "${BUILD_DIR}/Drive_x86_64"
 chmod +x "${MACOS_BIN_DIR}/Drive"
+
+echo "Ad-hoc signing Drive.app..."
+codesign --force --deep --sign - "${APP_BUNDLE}" > /dev/null 2>&1 || true
+
 echo "Built ${APP_BUNDLE} successfully."

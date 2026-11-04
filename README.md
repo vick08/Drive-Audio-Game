@@ -31,7 +31,16 @@ This repository preserves the complete original game assets while providing a br
 
 ---
 
-## How to Build and Run on macOS
+## Quick Start (Pre-built Release)
+
+1. Go to the [Releases](https://github.com/vick08/Drive-Audio-Game/releases) page.
+2. Download **Drive-macOS-v1.0.zip** for Mac (or **Drive-Windows-2002.zip** for Windows).
+3. On macOS, unzip and double-click `Drive.app` to play.
+   *(Note: On first launch, if macOS Gatekeeper flags the app as unnotarized, right-click `Drive.app` and select **Open**, or run `xattr -cr /Applications/Drive.app`).*
+
+---
+
+## How to Build and Run on macOS from Source
 
 ### Prerequisites
 - macOS 12.0 or newer

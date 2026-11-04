@@ -63,12 +63,43 @@ public struct HighScoreRecord: Codable, Equatable {
 public final class HighScoreStore {
     public let xtrasURL: URL
 
+    private var isAppBundle: Bool {
+        xtrasURL.path.contains(".app/")
+    }
+
+    private var storageDirectoryURL: URL {
+        if isAppBundle {
+            let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: NSTemporaryDirectory())
+            let dir = appSupport.appendingPathComponent("Drive")
+            if !FileManager.default.fileExists(atPath: dir.path) {
+                try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            }
+            return dir
+        } else {
+            return xtrasURL
+        }
+    }
+
     public var sdataURL: URL {
-        xtrasURL.appendingPathComponent("sdata")
+        let userURL = storageDirectoryURL.appendingPathComponent("sdata")
+        if isAppBundle && !FileManager.default.fileExists(atPath: userURL.path) {
+            let bundleURL = xtrasURL.appendingPathComponent("sdata")
+            if FileManager.default.fileExists(atPath: bundleURL.path) {
+                return bundleURL
+            }
+        }
+        return userURL
     }
 
     public var hiscoreJSONURL: URL {
-        xtrasURL.appendingPathComponent("hiscore.json")
+        let userURL = storageDirectoryURL.appendingPathComponent("hiscore.json")
+        if isAppBundle && !FileManager.default.fileExists(atPath: userURL.path) {
+            let bundleURL = xtrasURL.appendingPathComponent("hiscore.json")
+            if FileManager.default.fileExists(atPath: bundleURL.path) {
+                return bundleURL
+            }
+        }
+        return userURL
     }
 
     public init(xtrasURL: URL) {
@@ -96,12 +127,14 @@ public final class HighScoreStore {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         if let data = try? encoder.encode(record) {
-            try? data.write(to: hiscoreJSONURL, options: .atomic)
+            let targetURL = storageDirectoryURL.appendingPathComponent("hiscore.json")
+            try? data.write(to: targetURL, options: .atomic)
         }
     }
 
     public func writeSData(_ text: String) {
-        try? text.write(to: sdataURL, atomically: true, encoding: .utf8)
+        let targetURL = storageDirectoryURL.appendingPathComponent("sdata")
+        try? text.write(to: targetURL, atomically: true, encoding: .utf8)
     }
 
     public func readSData() -> String? {
